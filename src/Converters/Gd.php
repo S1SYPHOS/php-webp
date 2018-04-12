@@ -2,16 +2,9 @@
 
 namespace WebPConvert\Converters;
 
-class Gd
+class Gd extends ConverterAbstract
 {
-    // TODO: Move to WebPConvert or helper classes file (redundant, see Imagick.php)
-    public static function getExtension($filePath)
-    {
-        $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
-        return strtolower($fileExtension);
-    }
-
-    public static function convert($source, $destination, $quality, $stripMetadata)
+    public function convert($source, $destination, $quality, $stripMetadata)
     {
         try {
             if (!extension_loaded('gd')) {
@@ -22,7 +15,7 @@ class Gd
                 throw new \Exception('Required imagewebp() function is not available.');
             }
 
-            switch (self::getExtension($source)) {
+            switch ($this->getExtension($source)) {
                 case 'png':
                     if (defined('WEBPCONVERT_GD_PNG') && WEBPCONVERT_GD_PNG) {
                         return imagecreatefrompng($filePath);
