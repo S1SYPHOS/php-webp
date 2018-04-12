@@ -60,7 +60,6 @@ class WebPConvert
     /**
      * TODO: DocBlock
      */
-
     public static function convert($source, $destination, $quality = 85, $stripMetadata = true)
     {
         try {
@@ -69,20 +68,19 @@ class WebPConvert
                 $className = 'WebPConvert\\Converters\\' . $converter;
 
                 if (class_exists($className)) {
-                    $object = new $className();
+                    $object = new $className(
+                        $source,
+                        $destination,
+                        $quality,
+                        $stripMetadata
+                    );
                 }
-                
+
                 if (!is_callable([$object, 'convert'])) {
                     continue;
                 }
 
-                $conversion = call_user_func(
-                    [$object, 'convert'],
-                    $source,
-                    $destination,
-                    $quality,
-                    $stripMetadata
-                );
+                $conversion = call_user_func([$object, 'convert']);
 
                 if ($conversion) {
                     $success = true;

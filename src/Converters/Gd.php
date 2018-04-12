@@ -2,7 +2,7 @@
 
 namespace WebPConvert\Converters;
 
-use WepPConvert\ConverterAbstract;
+use WebPConvert\ConverterAbstract;
 
 /**
  * Class Gd
@@ -13,7 +13,7 @@ use WepPConvert\ConverterAbstract;
  */
 class Gd extends ConverterAbstract
 {
-    public function convert($source, $destination, $quality, $stripMetadata)
+    public function convert()
     {
         try {
             if (!extension_loaded('gd')) {
@@ -24,7 +24,7 @@ class Gd extends ConverterAbstract
                 throw new \Exception('Required imagewebp() function is not available.');
             }
 
-            switch ($this->getExtension($source)) {
+            switch ($this->getExtension($this->source)) {
                 case 'png':
                     if (defined('WEBPCONVERT_GD_PNG') && WEBPCONVERT_GD_PNG) {
                         return imagecreatefrompng($filePath);
@@ -33,7 +33,7 @@ class Gd extends ConverterAbstract
                     }
                     break;
                 default:
-                    $image = imagecreatefromjpeg($source);
+                    $image = imagecreatefromjpeg($this->source);
             }
 
             // Checks if either imagecreatefromjpeg() or imagecreatefrompng() returned false
@@ -44,7 +44,7 @@ class Gd extends ConverterAbstract
             return false; // TODO: `throw` custom \Exception $e & handle it smoothly on top-level.
         }
 
-        $success = imagewebp($image, $destination, $quality);
+        $success = imagewebp($image, $this->destination, $this->quality);
 
         /*
          * This hack solves an `imagewebp` bug
@@ -52,8 +52,8 @@ class Gd extends ConverterAbstract
          *
          */
 
-        if (filesize($destination) % 2 == 1) {
-            file_put_contents($destination, "\0", FILE_APPEND);
+        if (filesize($this->destination) % 2 == 1) {
+            file_put_contents($this->destination, "\0", FILE_APPEND);
         }
 
         imagedestroy($image);

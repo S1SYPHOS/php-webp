@@ -12,10 +12,17 @@ namespace WebPConvert;
 abstract class ConverterAbstract
 {
     // protected $extension = '';
-    protected $allowedExtensions = ['jpg', 'jpeg', 'png'];
+    protected $allowedExtensions;
+    protected $source, $destination, $quality, $strip;
 
     public function __construct($source, $destination, $quality, $stripMetadata)
     {
+        $this->allowedExtensions = ['jpg', 'jpeg', 'png'];
+        $this->source = $source;
+        $this->destination = $destination;
+        $this->quality = $quality;
+        $this->strip = $stripMetadata;
+
         try {
             $this->isValidTarget($source);
             $this->isAllowedExtension($source);
@@ -26,7 +33,7 @@ abstract class ConverterAbstract
     }
 
     // Forces every converter to implement `convert()` function
-    abstract protected function convert();
+    abstract public function convert();
 
     /**
      *  Common functionality
@@ -54,7 +61,7 @@ abstract class ConverterAbstract
     public function isAllowedExtension($filePath)
     {
         $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
-        if (!in_array(strtolower($fileExtension), self::$allowedExtensions)) {
+        if (!in_array(strtolower($fileExtension), $this->allowedExtensions)) {
             throw new \Exception('Unsupported file extension: ' . $fileExtension);
         }
 
