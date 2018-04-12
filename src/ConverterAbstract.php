@@ -1,5 +1,14 @@
 <?php
 
+namespace WebPConvert;
+
+/**
+ * Class ConverterAbstract
+ *
+ * Abstract class for all WebP converters
+ *
+ * @package WebPConvert
+ */
 abstract class ConverterAbstract
 {
     // protected $extension = '';

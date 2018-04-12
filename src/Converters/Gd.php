@@ -2,6 +2,15 @@
 
 namespace WebPConvert\Converters;
 
+use WepPConvert\ConverterAbstract;
+
+/**
+ * Class Gd
+ *
+ * Converts an image to WebP via GD Graphics (Draw)
+ *
+ * @package WebPConvert\Converters
+ */
 class Gd extends ConverterAbstract
 {
     public function convert($source, $destination, $quality, $stripMetadata)

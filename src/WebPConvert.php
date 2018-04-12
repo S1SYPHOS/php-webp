@@ -2,6 +2,13 @@
 
 namespace WebPConvert;
 
+/**
+ * Class WebPConvert
+ *
+ * Converts JPEG & PNG to WebP with PHP
+ *
+ * @package WebPConvert
+ */
 class WebPConvert
 {
     public static $preferredConverters = [];
