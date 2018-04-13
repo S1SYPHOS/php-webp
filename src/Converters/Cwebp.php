@@ -13,26 +13,20 @@ use WebPConvert\ConverterAbstract;
  */
 class Cwebp extends ConverterAbstract
 {
-    private $cwebpPaths;
-    private $binaryInfo;
+    private $cwebpPaths = [ // System paths to look for cwebp binary
+        '/usr/bin/cwebp',
+        '/usr/local/bin/cwebp',
+        '/usr/gnu/bin/cwebp',
+        '/usr/syno/bin/cwebp'
+    ];
 
-    public function __construct()
-    {
-        $this->cwebpPaths = [ // System paths to look for cwebp binary
-            '/usr/bin/cwebp',
-            '/usr/local/bin/cwebp',
-            '/usr/gnu/bin/cwebp',
-            '/usr/syno/bin/cwebp'
-        ];
-
-        $this->binaryInfo = [  // OS-specific binaries included in this library
-            'WinNT' => [ 'cwebp.exe', '49e9cb98db30bfa27936933e6fd94d407e0386802cb192800d9fd824f6476873'],
-            'Darwin' => [ 'cwebp-mac12', 'a06a3ee436e375c89dbc1b0b2e8bd7729a55139ae072ed3f7bd2e07de0ebb379'],
-            'SunOS' => [ 'cwebp-sol', '1febaffbb18e52dc2c524cda9eefd00c6db95bc388732868999c0f48deb73b4f'],
-            'FreeBSD' => [ 'cwebp-fbsd', 'e5cbea11c97fadffe221fdf57c093c19af2737e4bbd2cb3cd5e908de64286573'],
-            'Linux' => [ 'cwebp-linux', '916623e5e9183237c851374d969aebdb96e0edc0692ab7937b95ea67dc3b2568']
-        ][PHP_OS];
-    }
+    private $binaryInfo = [  // OS-specific binaries included in this library
+        'WinNT' => [ 'cwebp.exe', '49e9cb98db30bfa27936933e6fd94d407e0386802cb192800d9fd824f6476873'],
+        'Darwin' => [ 'cwebp-mac12', 'a06a3ee436e375c89dbc1b0b2e8bd7729a55139ae072ed3f7bd2e07de0ebb379'],
+        'SunOS' => [ 'cwebp-sol', '1febaffbb18e52dc2c524cda9eefd00c6db95bc388732868999c0f48deb73b4f'],
+        'FreeBSD' => [ 'cwebp-fbsd', 'e5cbea11c97fadffe221fdf57c093c19af2737e4bbd2cb3cd5e908de64286573'],
+        'Linux' => [ 'cwebp-linux', '916623e5e9183237c851374d969aebdb96e0edc0692ab7937b95ea67dc3b2568']
+    ][PHP_OS];
 
     public function checkRequirements()
     {
@@ -104,14 +98,6 @@ class Cwebp extends ConverterAbstract
          * Preparing options
          */
 
-        // Metadata (all, exif, icc, xmp or none (default))
-        // Comma-separated list of existing metadata to copy from input to output
-        $metadata = (
-            $this->strip
-            ? '-metadata none'
-            : '-metadata all'
-        );
-
         // lossless PNG conversion
         $lossless = (
             $this->extension == 'png'
@@ -122,13 +108,21 @@ class Cwebp extends ConverterAbstract
         // Built-in method option
         $method = (
             defined('WEBPCONVERT_CWEBP_METHOD')
-            ? ' -m ' . WEBPCONVERT_CWEBP_METHOD
-            : ' -m 6'
+            ? '-m ' . WEBPCONVERT_CWEBP_METHOD
+            : '-m 6'
+        );
+
+        // Metadata (all, exif, icc, xmp or none (default))
+        // Comma-separated list of existing metadata to copy from input to output
+        $metadata = (
+            $this->strip
+            ? '-metadata none'
+            : '-metadata all'
         );
 
         // Built-in low memory option
         if (!defined('WEBPCONVERT_CWEBP_LOW_MEMORY')) {
-            $lowMemory= '-low_memory';
+            $lowMemory = '-low_memory';
         } else {
             $lowMemory = (
                 WEBPCONVERT_CWEBP_LOW_MEMORY
@@ -138,16 +132,16 @@ class Cwebp extends ConverterAbstract
         }
 
         $optionsArray = [
-            $metadata = $metadata,
-            $quality = '-q ' . $this->quality,
             $lossless = $lossless,
+            $quality = '-q ' . $this->quality,
             $method = $method,
+            $metadata = $metadata,
             $lowMemory = $lowMemory,
             $input = $this->escapeFilename($this->source),
             $output = '-o ' . $this->escapeFilename($this->destination),
             $stderrRedirect = '2>&1'
         ];
-        $options = implode(' ', $optionsArray);
+        $options = implode(' ', array_filter($optionsArray));
 
         $nice = (
             $this->hasNiceSupport()
@@ -159,7 +153,6 @@ class Cwebp extends ConverterAbstract
         foreach ($binaries as $index => $binary) {
             $command = $nice . ' ' . $binary . ' ' . $options;
             exec($command, $output, $returnCode);
-            var_dump($command);
 
             if ($returnCode == 0) { // Everything okay!
                 // cwebp sets file permissions to 664 but instead ..
