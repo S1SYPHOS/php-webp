@@ -66,10 +66,6 @@ class Gd extends ConverterAbstract
 
         imagedestroy($image);
 
-        if (!$success) {
-            return false;
-        }
-
-        return true;
+        return $success;
     }
 }

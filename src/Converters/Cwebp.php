@@ -13,14 +13,14 @@ use WebPConvert\ConverterAbstract;
  */
 class Cwebp extends ConverterAbstract
 {
-    private $cwebpPaths = [ // System paths to look for cwebp binary
+    private $defaultPaths = [ // System paths to look for cwebp binary
         '/usr/bin/cwebp',
         '/usr/local/bin/cwebp',
         '/usr/gnu/bin/cwebp',
         '/usr/syno/bin/cwebp'
     ];
 
-    private $binaryInfo = [  // OS-specific binaries included in this library
+    private $binary = [  // OS-specific binaries included in this library
         'WinNT' => [ 'cwebp.exe', '49e9cb98db30bfa27936933e6fd94d407e0386802cb192800d9fd824f6476873'],
         'Darwin' => [ 'cwebp-mac12', 'a06a3ee436e375c89dbc1b0b2e8bd7729a55139ae072ed3f7bd2e07de0ebb379'],
         'SunOS' => [ 'cwebp-sol', '1febaffbb18e52dc2c524cda9eefd00c6db95bc388732868999c0f48deb73b4f'],
@@ -37,9 +37,14 @@ class Cwebp extends ConverterAbstract
         return true;
     }
 
-    public function updateBinaries($file, $hash, $array)
+    public function getBinaries()
     {
-        $binaryFile = __DIR__ . '/Binaries/' . $file;
+        // Removes system paths if the corresponding binary doesn't exist
+        $binaries = array_filter($this->defaultPaths, function ($binary) {
+            return file_exists($binary);
+        });
+
+        $binaryFile = __DIR__ . '/Binaries/' . $this->binary[0];
 
         // Throws an exception if binary file does not exist
         if (!file_exists($binaryFile)) {
@@ -50,13 +55,13 @@ class Cwebp extends ConverterAbstract
         $binaryHash = hash_file('sha256', $binaryFile);
 
         // Throws an exception if binary file checksum & deposited checksum do not match
-        if ($binaryHash != $hash) {
+        if ($binaryHash != $this->binary[1]) {
             throw new \Exception('Binary checksum is invalid.');
         }
 
-        array_unshift($array, $binaryFile);
+        $binaries[] = $binaryFile;
 
-        return $array;
+        return $binaries;
     }
 
     // Checks if 'Nice' is available
@@ -84,12 +89,8 @@ class Cwebp extends ConverterAbstract
         try {
             $this->checkRequirements();
 
-            // Checks if provided binary file & its hash match with deposited version & updates cwebp binary array
-            $binaries = $this->updateBinaries(
-                $this->binaryInfo[0],
-                $this->binaryInfo[1],
-                $this->cwebpPaths
-            );
+            // Preparing array holding possible binaries
+            $binaries = $this->getBinaries();
         } catch (\Exception $e) {
             return false; // TODO: `throw` custom \Exception $e & handle it smoothly on top-level.
         }
@@ -149,10 +150,12 @@ class Cwebp extends ConverterAbstract
             : ''
         );
 
+        $success = false;
+
         // Try all paths
         foreach ($binaries as $index => $binary) {
             $command = $nice . ' ' . $binary . ' ' . $options;
-            exec($command, $output, $returnCode);
+            exec($command, $result, $returnCode);
 
             if ($returnCode == 0) { // Everything okay!
                 // cwebp sets file permissions to 664 but instead ..
@@ -167,14 +170,8 @@ class Cwebp extends ConverterAbstract
                 $success = true;
                 break;
             }
-
-            $success = false;
         }
 
-        if (!$success) {
-            return false;
-        }
-
-        return true;
+        return $success;
     }
 }

@@ -81,6 +81,7 @@ class Imagick extends ConverterAbstract
         // 2. $im->writeImage($destination)
         $success = $im->writeImageFile(fopen($this->destination, 'wb'));
 
+        // TODO: Check whether Imagick::writeImageFile returns false if conversion was unsuccessful
         if (!$success) {
             return false;
         }
