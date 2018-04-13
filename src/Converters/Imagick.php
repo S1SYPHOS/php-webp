@@ -2,27 +2,36 @@
 
 namespace WebPConvert\Converters;
 
-class Imagick
+use WebPConvert\ConverterAbstract;
+
+/**
+ * Class Imagick
+ *
+ * Converts an image to WebP via ImageMagick
+ *
+ * @package WebPConvert\Converters
+ */
+class Imagick extends ConverterAbstract
 {
-    // TODO: Move to WebPConvert or helper classes file (redundant, see Gd.php)
-    public static function getExtension($filePath)
+    public function checkRequirements()
     {
-        $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
-        return strtolower($fileExtension);
+        if (!extension_loaded('imagick')) {
+            throw new \Exception('Required iMagick extension is not available.');
+        }
+
+        if (!class_exists('Imagick')) {
+            throw new \Exception('iMagick is installed but cannot handle source file.');
+        }
+
+        return true;
     }
 
-    public static function convert($source, $destination, $quality, $stripMetadata)
+    public function convertImage()
     {
         try {
-            if (!extension_loaded('imagick')) {
-                throw new \Exception('Required iMagick extension is not available.');
-            }
+            $this->checkRequirements();
 
-            if (!class_exists('Imagick')) {
-                throw new \Exception('iMagick is installed but cannot handle source file.');
-            }
-
-            $im = new \Imagick($source);
+            $im = new \Imagick($this->source);
 
             // Throws an exception if iMagick does not support WebP conversion
             if (!in_array('WEBP', $im->queryFormats())) {
@@ -35,7 +44,7 @@ class Imagick
         }
 
         // Apply losless compression for PNG images
-        switch (self::getExtension($source)) {
+        switch ($this->extension) {
             case 'png':
                 $im->setOption('webp:lossless', 'true');
                 break;
@@ -65,12 +74,12 @@ class Imagick
             ));
         }
 
-        $im->setImageCompressionQuality($quality);
+        $im->setImageCompressionQuality($this->quality);
 
         // TODO: Check out other iMagick methods, see http://php.net/manual/de/imagick.writeimage.php#114714
         // 1. file_put_contents($destination, $im)
         // 2. $im->writeImage($destination)
-        $success = $im->writeImageFile(fopen($destination, 'wb'));
+        $success = $im->writeImageFile(fopen($this->destination, 'wb'));
 
         if (!$success) {
             return false;

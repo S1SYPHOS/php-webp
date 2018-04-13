@@ -13,23 +13,31 @@ use WebPConvert\ConverterAbstract;
  */
 class Gd extends ConverterAbstract
 {
-    public function convert()
+    public function checkRequirements()
+    {
+        if (!extension_loaded('gd')) {
+            throw new \Exception('Required GD extension is not available.');
+        }
+
+        if (!function_exists('imagewebp')) {
+            throw new \Exception('Required imagewebp() function is not available.');
+        }
+
+        return true;
+    }
+
+    public function convertImage()
     {
         try {
-            if (!extension_loaded('gd')) {
-                throw new \Exception('Required GD extension is not available.');
-            }
+            $this->checkRequirements();
 
-            if (!function_exists('imagewebp')) {
-                throw new \Exception('Required imagewebp() function is not available.');
-            }
-
-            switch ($this->getExtension($this->source)) {
+            switch ($this->extension) {
                 case 'png':
                     if (defined('WEBPCONVERT_GD_PNG') && WEBPCONVERT_GD_PNG) {
-                        return imagecreatefrompng($filePath);
+                        return imagecreatefrompng($this->source);
                     } else {
-                        throw new \Exception('PNG file conversion failed. Try forcing it with: define("WEBPCONVERT_GD_PNG", true);');
+                        // TODO: Troubleshooting section: define("WEBPCONVERT_GD_PNG", true);
+                        throw new \Exception('PNG file conversion failed.');
                     }
                     break;
                 default:
