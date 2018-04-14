@@ -14,70 +14,34 @@ use PHPUnit\Framework\TestCase;
 
 class CwebpTest extends TestCase
 {
-    public function testCwebpDefaultPaths()
+    private $source;
+    private $destination;
+    
+    public function __construct()
     {
-        $default = [
-            '/usr/bin/cwebp',
-            '/usr/local/bin/cwebp',
-            '/usr/gnu/bin/cwebp',
-            '/usr/syno/bin/cwebp'
-        ];
-
-        foreach ($default as $key) {
-            $this->assertContains($key, Cwebp::$cwebpDefaultPaths);
-        }
+        $this->cwebp = new Cwebp(
+            realpath(__DIR__ . '/../test.jpg'),
+            realpath(__DIR__ . '/../test.webp')
+        );
     }
 
-    /**
-     * @expectedException \Exception
-     */
-    public function testUpdateBinariesInvalidFile()
+    public function testCheckRequirements()
     {
-        $array = [];
-
-        Cwebp::updateBinaries('InvalidFile', 'Hash', $array);
+        $this->assertNotNull($this->cwebp->checkRequirements());
     }
 
-    /**
-     * @expectedException \Exception
-     */
-    public function testUpdateBinariesInvalidHash()
+    public function testPrepareBinaries()
     {
-        $array = [];
-
-        Cwebp::updateBinaries('cwebp-linux', 'InvalidHash', $array);
-    }
-
-    public function testUpdateBinaries()
-    {
-        $file = 'cwebp.exe';
-        $filePath = realpath(__DIR__ . '/../../Converters/Binaries/' . $file);
-        $hash = hash_file('sha256', $filePath);
-        $array = [];
-
-        $this->assertContains($filePath, Cwebp::updateBinaries($file, $hash, $array));
-    }
-
-    public function testEscapeFilename()
-    {
-        $wrong = '/path/to/file Na<>me."ext"';
-        $right = '/path/to/file\\\ Name.\&#34;ext\&#34;';
-
-        $this->assertEquals($right, Cwebp::escapeFilename($wrong));
+        $this->assertNotEmpty($this->cwebp->prepareBinaries());
     }
 
     public function testHasNiceSupport()
     {
-        $this->assertNotNull(Cwebp::hasNiceSupport());
+        $this->assertNotNull($this->cwebp->hasNiceSupport());
     }
 
     public function testConvert()
     {
-        $source = realpath(__DIR__ . '/../test.jpg');
-        $destination = realpath(__DIR__ . '/../test.webp');
-        $quality = 85;
-        $stripMetadata = true;
-
-        $this->assertTrue(Cwebp::convert($source, $destination, $quality, $stripMetadata));
+        $this->assertTrue($this->cwebp->convertImage());
     }
 }

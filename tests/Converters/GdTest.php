@@ -14,13 +14,24 @@ use PHPUnit\Framework\TestCase;
 
 class GdTest extends TestCase
 {
+    private $source;
+    private $destination;
+
+    public function __construct()
+    {
+        $this->gd = new Gd(
+            realpath(__DIR__ . '/../test.jpg'),
+            realpath(__DIR__ . '/../test.webp')
+        );
+    }
+
+    public function testCheckRequirements()
+    {
+        $this->assertNotNull($this->gd->checkRequirements());
+    }
+
     public function testConvert()
     {
-        $source = realpath(__DIR__ . '/../test.jpg');
-        $destination = realpath(__DIR__ . '/../test.webp');
-        $quality = 85;
-        $stripMetadata = true;
-
-        $this->assertTrue(Gd::convert($source, $destination, $quality, $stripMetadata));
+        $this->assertTrue($this->gd->convertImage());
     }
 }

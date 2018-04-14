@@ -14,18 +14,24 @@ use PHPUnit\Framework\TestCase;
 
 class ImagickTest extends TestCase
 {
-    public function testGetExtension()
+    private $source;
+    private $destination;
+
+    public function __construct()
     {
-        $this->assertEquals('php', Imagick::getExtension(__FILE__));
+        $this->imagick = new Imagick(
+            realpath(__DIR__ . '/../test.jpg'),
+            realpath(__DIR__ . '/../test.webp')
+        );
+    }
+
+    public function testCheckRequirements()
+    {
+        $this->assertNotNull($this->imagick->checkRequirements());
     }
 
     public function testConvert()
     {
-        $source = realpath(__DIR__ . '/../test.jpg');
-        $destination = realpath(__DIR__ . '/../test.webp');
-        $quality = 85;
-        $stripMetadata = true;
-
-        $this->assertTrue(Imagick::convert($source, $destination, $quality, $stripMetadata));
+        $this->assertTrue($this->imagick->convertImage());
     }
 }

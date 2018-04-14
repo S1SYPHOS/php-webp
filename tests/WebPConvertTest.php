@@ -14,33 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class WebPConvertTest extends TestCase
 {
-    public function testPreferredConverters()
-    {
-        $this->assertEmpty(WebPConvert::$preferredConverters);
-    }
-
-    public function testExcludeDefaultBinaries()
-    {
-        $this->assertFalse(WebPConvert::$excludeDefaultBinaries);
-    }
-    
-    public function testAllowedExtensions()
-    {
-        $allowed = ['jpg', 'jpeg', 'png'];
-
-        foreach ($allowed as $key) {
-            $this->assertContains($key, WebPConvert::$allowedExtensions);
-        }
-    }
-
-    public function testSetConverters()
-    {
-        $preferred = ['gd', 'cwebp'];
-        WebPConvert::setConverters($preferred);
-
-        $this->assertEquals($preferred, WebPConvert::$preferredConverters);
-    }
-
     /**
      * @expectedException \Exception
      */
@@ -73,35 +46,63 @@ class WebPConvertTest extends TestCase
         $this->assertTrue(WebPConvert::isAllowedExtension($source));
     }
 
-    public function testGetConvertersDefault()
+    public function testCreateWritableFolder()
     {
-        $default = ['cwebp', 'ewww', 'gd', 'imagick'];
+        $source = (__DIR__ . '/test/test.file');
+        $path = pathinfo($source, PATHINFO_DIRNAME);
 
-        foreach ($default as $key) {
-            $this->assertContains($key, WebPConvert::getConverters());
-        }
+        $this->assertTrue(WebPConvert::createWritableFolder($source));
+        $this->assertDirectoryExists($path);
+        $this->assertDirectoryIsWritable($path);
     }
 
-    public function testGetConvertersCustom()
+    public function testDefaultConverterOrder()
     {
-        WebPConvert::$preferredConverters = ['gd', 'cwebp'];
-        $custom = ['gd', 'cwebp', 'ewww', 'imagick'];
+        // Tests optimized converter order ('default order')
+        $default = ['imagick', 'cwebp', 'gd', 'ewww'];
 
-        $this->assertEquals($custom, WebPConvert::getConverters());
+        $this->assertEquals($default, WebPConvert::prepareConverters());
     }
 
     public function testSetGetConverters()
     {
+        // Tests resetting converters
+        WebPConvert::setConverters();
+
+        $this->assertEmpty(WebPConvert::getConverters());
+
+        // Tests correct setting of converters ('natural order')
+        $natural = ['cwebp', 'ewww', 'gd', 'imagick'];
+        WebPConvert::setConverters($natural);
+
+        $this->assertEquals($natural, WebPConvert::getConverters());
+
+        // Tests excluding default binaries ('exclusive order')
+        $exclusive = ['gd', 'cwebp'];
+        WebPConvert::setConverters($exclusive, true);
+
+        $this->assertEquals($exclusive, WebPConvert::getConverters());
+    }
+
+    public function testPrepareConverters()
+    {
+        WebPConvert::setConverters();
+        $natural = ['cwebp', 'ewww', 'gd', 'imagick'];
+
+        $this->assertEquals($natural, WebPConvert::prepareConverters());
+
+        // Tests excluding default binaries
         $preferred = ['gd', 'cwebp'];
         WebPConvert::setConverters($preferred, true);
 
-        $this->assertEquals($preferred, WebPConvert::getConverters());
+        $this->assertEquals($preferred, WebPConvert::prepareConverters());
     }
 
     public function testConvert()
     {
         $source = (__DIR__ . '/test.jpg');
         $destination = (__DIR__ . '/test.webp');
+        WebPConvert::setConverters(['imagick', 'cwebp', 'gd', 'ewww']);
 
         $this->assertTrue(WebPConvert::convert($source, $destination));
     }
