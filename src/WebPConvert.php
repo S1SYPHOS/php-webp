@@ -11,9 +11,9 @@ namespace WebPConvert;
  */
 class WebPConvert
 {
-    public static $preferredConverters = [];
-    public static $excludeDefaultBinaries = false;
-    public static $allowedExtensions = ['jpg', 'jpeg', 'png'];
+    private static $preferredConverters = ['imagick', 'cwebp', 'gd'];
+    private static $excludeDefaultBinaries = false;
+    private static $allowedExtensions = ['jpg', 'jpeg', 'png'];
 
     // Throws an exception if the provided file doesn't exist
     public static function isValidTarget($filePath)
@@ -88,9 +88,9 @@ class WebPConvert
     }
 
     // Defines the array of preferred converters
-    public static function setConverters($array, $exclude = false)
+    public static function setConverters($preferredConverters = [], $exclude = false)
     {
-        self::$preferredConverters = $array;
+        self::$preferredConverters = $preferredConverters;
 
         if ($exclude) {
             self::$excludeDefaultBinaries = true;
@@ -98,6 +98,11 @@ class WebPConvert
     }
 
     public static function getConverters()
+    {
+        return self::$preferredConverters;
+    }
+
+    public static function prepareConverters()
     {
         // Prepare building up an array of converters
         $converters = [];
@@ -107,6 +112,11 @@ class WebPConvert
             $fileName = basename($filePath, '.php');
             return strtolower($fileName);
         }, glob(__DIR__ . '/Converters/*.php'));
+
+        // If no preferred converters are set, return available ones
+        if (empty(self::$preferredConverters)) {
+            return $availableConverters;
+        }
 
         // Checks if preferred converters match available converters and adds all matches to $converters array
         foreach (self::$preferredConverters as $preferredConverter) {
@@ -142,18 +152,20 @@ class WebPConvert
 
             $success = false;
 
-            foreach (self::getConverters() as $converter) {
+            foreach (self::prepareConverters() as $converter) {
                 $converter = ucfirst($converter);
                 $className = 'WebPConvert\\Converters\\' . $converter;
 
-                if (class_exists($className)) {
-                    $object = new $className(
-                        $source,
-                        $destination,
-                        $quality,
-                        $stripMetadata
-                    );
+                if (!class_exists($className)) {
+                    continue;
                 }
+
+                $object = new $className(
+                    $source,
+                    $destination,
+                    $quality,
+                    $stripMetadata
+                );
 
                 if (!is_callable([$object, 'convertImage'])) {
                     continue;

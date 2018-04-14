@@ -17,7 +17,7 @@ abstract class ConverterAbstract
     protected $strip;
     protected $extension;
 
-    public function __construct($source, $destination, $quality, $stripMetadata)
+    public function __construct($source, $destination, $quality = 85, $stripMetadata = false)
     {
         $this->source = $source;
         $this->destination = $destination;

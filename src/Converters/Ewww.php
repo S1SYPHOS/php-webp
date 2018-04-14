@@ -35,6 +35,7 @@ class Ewww extends ConverterAbstract
     }
 
     // Throws an exception if the provided API key is invalid
+    // TODO: Move to ConverterAbstract when other cloud services are added
     public function isValidKey($key = WEBPCONVERT_EWWW_KEY)
     {
         try {
@@ -92,6 +93,7 @@ class Ewww extends ConverterAbstract
             return false; // TODO: `throw` custom \Exception $e & handle it smoothly on top-level.
         }
 
+        // TODO: Remove header data from image (substr($curl->responseHeaders, $result))
         $success = file_put_contents($this->destination, $result);
 
         if (!$success) {
