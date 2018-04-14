@@ -5,13 +5,13 @@ namespace WebPConvert\Converters;
 use WebPConvert\ConverterAbstract;
 
 /**
- * Class Ewww
+ * Class Optimus
  *
- * Converts an image to WebP via EWWW Online Image Optimizer
+ * Converts an image to WebP via Optimus.io by KeyCDN
  *
  * @package WebPConvert\Converters
  */
-class Ewww extends ConverterAbstract
+class Optimus extends ConverterAbstract
 {
     public function checkRequirements()
     {
