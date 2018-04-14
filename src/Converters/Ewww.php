@@ -2,10 +2,18 @@
 
 namespace WebPConvert\Converters;
 
-class Ewww
+use WebPConvert\ConverterAbstract;
+
+/**
+ * Class Ewww
+ *
+ * Converts an image to WebP via EWWW Online Image Optimizer
+ *
+ * @package WebPConvert\Converters
+ */
+class Ewww extends ConverterAbstract
 {
-    // Checks if all requirements of cURL are met
-    protected static function checkRequirements($curl_file_create = true)
+    public function checkRequirements()
     {
         if (!extension_loaded('curl')) {
             throw new \Exception('Required cURL extension is not available.');
@@ -15,44 +23,31 @@ class Ewww
             throw new \Exception('Required url_init() function is not available.');
         }
 
-        if (!$curl_file_create && !function_exists('curl_file_create')) {
-            throw new \Exception('Required curl_file_create() function is not available (requires PHP > 5.5).');
-        }
-
         if (!defined("WEBPCONVERT_EWWW_KEY")) {
             throw new \Exception('Missing API key.');
         }
-        
+
+        if (!function_exists('curl_file_create')) {
+            throw new \Exception('Required curl_file_create() function is not available (requires PHP > 5.5).');
+        }
+
         return true;
     }
 
     // Throws an exception if the provided API key is invalid
-    public static function isValidKey($key = WEBPCONVERT_EWWW_KEY)
+    public function isValidKey($key = WEBPCONVERT_EWWW_KEY)
     {
         try {
-            self::checkRequirements(false);
+            $curl = new \Curl\Curl();
+            $result = $curl->post('https://optimize.exactlywww.com/verify/', [
+                'api_key' => $key
+            ]);
 
-            $ch = curl_init();
-            if (!$ch) {
-                throw new \Exception('Could not initialise cURL.');
-            }
-
-            $headers = [];
-            $headers[] = "Content-Type: application/x-www-form-urlencoded";
-
-            curl_setopt($ch, CURLOPT_URL, "https://optimize.exactlywww.com/quota/");
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, "api_key=' . $key . '");
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-            $response = curl_exec($ch);
-
-            if (curl_errno($ch)) {
-                throw new \Exception(curl_error($ch));
+            if ($curl->error) {
+                throw new \Exception($curl->errorMessage . ' - ' . $curl->errorCode);
             }
         } catch (\Exception $e) {
-            echo 'Error: ' . $e->getMessage();
+            return false; // TODO: Throw $e so error may be inspected later
         }
 
         /*
@@ -62,56 +57,42 @@ class Ewww
          * '' = an empty response indicates that the key is not valid
         */
 
-        $result[] = $response;
-        curl_close($ch);
+        $success = (bool) preg_match('/great/', $result);
 
-        return implode($result, '<br>');
+        if (!$success && preg_match('/exceeded/', $result)) {
+            throw new \Exception('API key is valid, but has no remaining image credits.');
+        }
+
+        return $success;
     }
 
-    public static function convert($source, $destination, $quality, $stripMetadata)
+    public function convertImage()
     {
         try {
-            self::checkRequirements();
+            $this->checkRequirements();
 
-            $ch = curl_init();
-            if (!$ch) {
-                throw new \Exception('Could not initialise cURL.');
-            }
+            // Checking if provided key is valid
+            $this->isValidKey();
 
-            $curlOptions = [
+            // Initializing cURL, setting response headers & requesting image conversion
+            $curl = new \Curl\Curl();
+            $curl->setHeader('User-Agent: WebPConvert', 'Accept: image/*');
+            $result = $curl->post('https://optimize.exactlywww.com/v2/', [
                 'api_key' => WEBPCONVERT_EWWW_KEY,
                 'webp' => '1',
-                'file' => curl_file_create($source),
-                'domain' => $_SERVER['HTTP_HOST'],
-                'quality' => $quality,
-                'metadata' => ($stripMetadata ? '0' : '1')
-            ];
-
-            curl_setopt_array($ch, [
-                CURLOPT_URL => "https://optimize.exactlywww.com/v2/",
-                CURLOPT_HTTPHEADER => [
-                    'User-Agent: WebPConvert',
-                    'Accept: image/*'
-                ],
-                CURLOPT_POSTFIELDS => $curlOptions,
-                CURLOPT_BINARYTRANSFER => true,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HEADER => false,
-                CURLOPT_SSL_VERIFYPEER => false
+                'file' => curl_file_create($this->source),
+                'quality' => $this->quality,
+                'metadata' => ($this->strip ? '0' : '1')
             ]);
 
-            $response = curl_exec($ch);
-
-            if (curl_errno($ch)) {
-                throw new \Exception(curl_error($ch));
+            if ($curl->error) {
+                throw new \Exception($curl->errorMessage . ' - ' . $curl->errorCode);
             }
         } catch (\Exception $e) {
             return false; // TODO: `throw` custom \Exception $e & handle it smoothly on top-level.
         }
 
-        curl_close($ch);
-
-        $success = file_put_contents($destination, $response);
+        $success = file_put_contents($this->destination, $result);
 
         if (!$success) {
             return false;
