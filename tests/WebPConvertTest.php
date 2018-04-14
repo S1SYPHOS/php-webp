@@ -59,7 +59,7 @@ class WebPConvertTest extends TestCase
     public function testDefaultConverterOrder()
     {
         // Tests optimized converter order ('default order')
-        $default = ['imagick', 'cwebp', 'gd', 'ewww'];
+        $default = ['imagick', 'cwebp', 'gd', 'ewww', 'optimus'];
 
         $this->assertEquals($default, WebPConvert::prepareConverters());
     }
@@ -87,7 +87,7 @@ class WebPConvertTest extends TestCase
     public function testPrepareConverters()
     {
         WebPConvert::setConverters();
-        $natural = ['cwebp', 'ewww', 'gd', 'imagick'];
+        $natural = ['cwebp', 'ewww', 'gd', 'imagick', 'optimus'];
 
         $this->assertEquals($natural, WebPConvert::prepareConverters());
 

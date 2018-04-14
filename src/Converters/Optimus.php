@@ -36,20 +36,34 @@ class Optimus extends ConverterAbstract
             $this->checkRequirements();
 
             // Initializing cURL, setting response headers & requesting image conversion
-            $curl = new \Curl\Curl();
-            $curl->setHeader('User-Agent: Optimus-API', 'Accept: image/*');
-            $result = $curl->post('https://api.optimus.io/' . WEBPCONVERT_OPTIMUS_KEY . '?webp', [
-                'file' => curl_file_create($this->source)
-            ]);
+            $url = 'https://api.optimus.io/' . WEBPCONVERT_OPTIMUS_KEY . '?webp';
+            $headers = array(
+                'User-Agent: Optimus-API',
+                'Accept: image/*'
+            );
+            $ch = curl_init();
+            curl_setopt_array($ch, array(
+                CURLOPT_URL => $url,
+                CURLOPT_HTTPHEADER => $headers,
+                CURLOPT_POSTFIELDS => file_get_contents($this->source),
+                CURLOPT_BINARYTRANSFER => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HEADER => true,
+                CURLOPT_SSL_VERIFYPEER => true
+            ));
+            $response = curl_exec($ch);
+            $curlError = curl_error($ch);
 
-            if ($curl->error) {
-                throw new \Exception($curl->errorMessage . ' - ' . $curl->errorCode);
+            $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $result = substr($response, $header_size);
+
+            if (!empty($curlError) || empty($result)) {
+                throw new Exception('cURL failed: ' . $curlError . ' Output: ' . $body);
             }
         } catch (\Exception $e) {
             return false; // TODO: `throw` custom \Exception $e & handle it smoothly on top-level.
         }
 
-        // TODO: Remove header data from image (substr($curl->responseHeaders, $result))
         $success = file_put_contents($this->destination, $result);
 
         if (!$success) {
