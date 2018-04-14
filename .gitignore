@@ -1,5 +1,7 @@
 .php_cs.cache
 composer.lock
 composer.phar
+config.json
 /vendor
 /tests/*.webp
+/tests/test
