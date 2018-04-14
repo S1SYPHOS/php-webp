@@ -1,7 +1,7 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude('Tests')
+    ->exclude('tests')
     ->in(__DIR__)
 ;
 
@@ -17,3 +17,4 @@ $config
 ;
 
 return $config;
+
