@@ -27,17 +27,18 @@ class EwwwTest extends TestCase
 
     public function testCheckRequirements()
     {
-        $configPath = realpath(__DIR__ . '/../../config.json');
-        $configFile = file_get_contents($configPath);
-        $configArray = json_decode($configFile, true);
-
-        define("WEBPCONVERT_EWWW_KEY", $configArray['ewww']);
+        define("WEBPCONVERT_EWWW_KEY", "key-abc123");
 
         $this->assertNotNull($this->ewww->checkRequirements());
     }
 
+    public function testIsValidKeyInvalid()
+    {
+        $this->assertFalse($this->ewww->isValidKey('key-abc123'));
+    }
+
     public function testConvert()
     {
-        $this->assertTrue($this->ewww->convertImage());
+        $this->assertNotNull($this->ewww->convert());
     }
 }

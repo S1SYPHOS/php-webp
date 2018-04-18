@@ -19,12 +19,14 @@ class WebPConvertTest extends TestCase
      */
     public function testIsValidTargetInvalid()
     {
-        WebPConvert::isValidTarget('Invalid');
+        $wpc = new WebPConvert();
+        $wpc->isValidTarget('Invalid');
     }
 
     public function testIsValidTargetValid()
     {
-        $this->assertTrue(WebPConvert::isValidTarget(__FILE__));
+        $wpc = new WebPConvert();
+        $this->assertTrue($wpc->isValidTarget(__FILE__));
     }
 
     /**
@@ -32,78 +34,76 @@ class WebPConvertTest extends TestCase
      */
     public function testIsAllowedExtensionInvalid()
     {
+        $wpc = new WebPConvert();
         $allowed = ['jpg', 'jpeg', 'png'];
 
         foreach ($allowed as $key) {
-            WebPConvert::isAllowedExtension(__FILE__);
+            $wpc->isAllowedExtension(__FILE__);
         }
     }
 
     public function testIsAllowedExtensionValid()
     {
+        $wpc = new WebPConvert();
         $source = (__DIR__ . '/test.jpg');
-
-        $this->assertTrue(WebPConvert::isAllowedExtension($source));
+        $this->assertTrue($wpc->isAllowedExtension($source));
     }
 
     public function testCreateWritableFolder()
     {
+        $wpc = new WebPConvert();
         $source = (__DIR__ . '/test/test.file');
         $path = pathinfo($source, PATHINFO_DIRNAME);
-
-        $this->assertTrue(WebPConvert::createWritableFolder($source));
+        $wpc->createWritableFolder($source);
         $this->assertDirectoryExists($path);
         $this->assertDirectoryIsWritable($path);
     }
 
     public function testDefaultConverterOrder()
     {
-        // Tests optimized converter order ('default order')
-        $default = ['imagick', 'cwebp', 'gd', 'ewww', 'optimus'];
-
-        $this->assertEquals($default, WebPConvert::prepareConverters());
+        $wpc = new WebPConvert();
+        $default = ['imagick', 'cwebp', 'gd', 'ewww', 'optimus']; // optimized converter order ('default order')
+        $this->assertEquals($default, $wpc->setUpConverters());
     }
 
     public function testSetGetConverters()
     {
-        // Tests resetting converters
-        WebPConvert::setConverters();
-
-        $this->assertEmpty(WebPConvert::getConverters());
+        $wpc = new WebPConvert();
+        $this->assertEmpty($wpc->getConverters());
 
         // Tests correct setting of converters ('natural order')
         $natural = ['cwebp', 'ewww', 'gd', 'imagick'];
-        WebPConvert::setConverters($natural);
-
-        $this->assertEquals($natural, WebPConvert::getConverters());
+        $wpc->setConverters($natural);
+        $this->assertEquals($natural, $wpc->getConverters());
 
         // Tests excluding default binaries ('exclusive order')
         $exclusive = ['gd', 'cwebp'];
-        WebPConvert::setConverters($exclusive, true);
-
-        $this->assertEquals($exclusive, WebPConvert::getConverters());
+        $wpc->setConverters($exclusive);
+        $wpc->skipDefaultConverters();
+        $this->assertEquals($exclusive, $wpc->getConverters());
     }
 
-    public function testPrepareConverters()
+    public function testsetUpConverters()
     {
-        WebPConvert::setConverters();
-        $natural = ['cwebp', 'ewww', 'gd', 'imagick', 'optimus'];
-
-        $this->assertEquals($natural, WebPConvert::prepareConverters());
+        $wpc = new WebPConvert();
+        $natural = ['imagick', 'cwebp', 'gd', 'ewww', 'optimus'];
+        $this->assertEquals($natural, $wpc->setUpConverters());
 
         // Tests excluding default binaries
         $preferred = ['gd', 'cwebp'];
-        WebPConvert::setConverters($preferred, true);
+        $wpc->setConverters($preferred);
+        $wpc->skipDefaultConverters();
 
-        $this->assertEquals($preferred, WebPConvert::prepareConverters());
+        $this->assertEquals($preferred, $wpc->setUpConverters());
     }
 
     public function testConvert()
     {
+        $wpc = new WebPConvert();
         $source = (__DIR__ . '/test.jpg');
         $destination = (__DIR__ . '/test.webp');
-        WebPConvert::setConverters(['imagick', 'cwebp', 'gd', 'ewww']);
+        $wpc->setConverters(['imagick', 'cwebp', 'gd', 'ewww']);
 
-        $this->assertTrue(WebPConvert::convert($source, $destination));
+        $this->assertTrue($wpc->convert($source, $destination));
     }
 }

@@ -16,7 +16,7 @@ class CwebpTest extends TestCase
 {
     private $source;
     private $destination;
-    
+
     public function __construct()
     {
         $this->cwebp = new Cwebp(
@@ -30,9 +30,9 @@ class CwebpTest extends TestCase
         $this->assertNotNull($this->cwebp->checkRequirements());
     }
 
-    public function testPrepareBinaries()
+    public function testSetUpBinaries()
     {
-        $this->assertNotEmpty($this->cwebp->prepareBinaries());
+        $this->assertNotEmpty($this->cwebp->setUpBinaries());
     }
 
     public function testHasNiceSupport()
@@ -42,6 +42,6 @@ class CwebpTest extends TestCase
 
     public function testConvert()
     {
-        $this->assertTrue($this->cwebp->convertImage());
+        $this->assertTrue($this->cwebp->convert());
     }
 }

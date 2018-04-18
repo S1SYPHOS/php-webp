@@ -32,6 +32,6 @@ class GdTest extends TestCase
 
     public function testConvert()
     {
-        $this->assertTrue($this->gd->convertImage());
+        $this->assertTrue($this->gd->convert());
     }
 }

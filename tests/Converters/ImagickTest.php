@@ -32,6 +32,6 @@ class ImagickTest extends TestCase
 
     public function testConvert()
     {
-        $this->assertTrue($this->imagick->convertImage());
+        $this->assertTrue($this->imagick->convert());
     }
 }
