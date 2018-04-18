@@ -1,5 +1,5 @@
-# WebPConvert
-*Convert JPEG & PNG to WebP with PHP*
+# PHP-WebP
+*The WebP conversion library for PHP*
 
 In summary, the current state of WebP conversion in PHP is this: There are several ways to do it, but they all require *something* of the server setup. What works on one shared host might not work on another. `WebPConvert` combines these methods by iterating over them (optionally in the desired order) until one of them is successful - or all of them fail.
 
@@ -12,6 +12,8 @@ In summary, the current state of WebP conversion in PHP is this: There are sever
   - [`gd`](#gd-graphics-draw)
   - [`cwebp`](#cwebp-binary)
   - [`ewww`](#ewww-cloud-service)
+- [5. Development](#development)
+- [6. Credits & License](#credits--license)
 
 ## Introduction
 Basically, there are three ways for JPEG & PNG to WebP conversion:
@@ -241,3 +243,9 @@ Furthermore, testing is done with Sebastian Bergmann's excellent testing framewo
 ```text
 composer test
 ```
+
+## Credits / License
+`php-webp` was originally forked from Bjørn Rosell's [WebPConvert](https://github.com/rosell-dk/webp-convert) and is licensed under the [MIT License](LICENSE).
+
+## Special Thanks
+I'd like to thank everybody that's making great software - you people are awesome. Also I'm always thankful for feedback and bug reports :)
