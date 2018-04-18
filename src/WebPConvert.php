@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * WebPConvert - The WebP conversion library for PHP
+ *
+ * @link https://github.com/S1SYPHOS/webp-convert
+ * @license https://opensource.org/licenses/MIT MIT
+ */
+
 namespace WebPConvert;
 
 /**
@@ -11,12 +18,54 @@ namespace WebPConvert;
  */
 class WebPConvert
 {
-    private static $preferredConverters = ['imagick', 'cwebp', 'gd'];
-    private static $excludeDefaultBinaries = false;
-    private static $allowedExtensions = ['jpg', 'jpeg', 'png'];
+    /**
+     * Current version number of WebPConvert
+     */
+    const VERSION = '1.0.0';
 
-    // Throws an exception if the provided file doesn't exist
-    public static function isValidTarget($filePath)
+    /**
+     * Available converters (in order of capability)
+     *
+     * @var array
+     */
+    private $converters = ['imagick', 'cwebp', 'gd', 'ewww', 'optimus'];
+
+    /**
+     * Preferred converters
+     *
+     * @var array
+     */
+    protected $preferredConverters = [];
+
+    /**
+     * Whether to skip available converters when preferred ones are set
+     *
+     * @var boolean
+     */
+    protected $skipDefaultConverters = false;
+
+    /**
+     * File extensions viable for WebP conversion
+     *
+     * @var array
+     */
+    protected $allowedExtensions = ['jpg', 'jpeg', 'png'];
+
+    public function __construct($converters = null)
+    {
+        if ($converters != null) {
+            $this->setConverters($converters);
+        }
+    }
+
+    /**
+     * Checks whether provided file exists
+     *
+     * @param string $filePath
+     *
+     * @return boolean
+     */
+    public function isValidTarget($filePath)
     {
         if (!file_exists($filePath)) {
             throw new \Exception('File or directory not found: ' . $filePath);
@@ -25,19 +74,29 @@ class WebPConvert
         return true;
     }
 
-    // Throws an exception if the provided file's extension is invalid
-    public static function isAllowedExtension($filePath)
+    /**
+     * Checks whether provided file's extension is viable for WebP conversion
+     *
+     * @param string $filePath
+     *
+     * @return boolean
+     */
+    public function isAllowedExtension($filePath)
     {
         $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
-        if (!in_array(strtolower($fileExtension), self::$allowedExtensions)) {
+        if (!in_array(strtolower($fileExtension), $this->allowedExtensions)) {
             throw new \Exception('Unsupported file extension: ' . $fileExtension);
         }
 
         return true;
     }
 
-    // Creates folder in provided path & sets correct permissions
-    public static function createWritableFolder($filePath)
+    /**
+     * Creates folder in provided path & sets correct permissions
+     *
+     * @param string $filePath
+     */
+    public function createWritableFolder($filePath)
     {
         $folder = pathinfo($filePath, PATHINFO_DIRNAME);
 
@@ -84,97 +143,133 @@ class WebPConvert
             throw new \Exception('Existing file cannot be removed: ' . basename($filePath));
         }
 
-        return true;
+        return;
     }
 
-    // Defines the array of preferred converters
-    public static function setConverters($preferredConverters = [], $exclude = false)
+    /**
+     * Sets preferred converter(s)
+     *
+     * Note:
+     * Calling this function without arguments resets $preferredConverters, whereas
+     * passing single converter as string also sets $skipDefaultConverters `true`
+     *
+     * @param array|string $preferred
+     */
+    public function setConverters($preferred = [])
     {
-        self::$preferredConverters = $preferredConverters;
+        if (is_string($preferred)) {
+            $this->preferredConverters = (array) $preferred;
+            $this->skipDefaultConverters();
 
-        if ($exclude) {
-            self::$excludeDefaultBinaries = true;
+            return;
         }
+        $this->preferredConverters = $preferred;
     }
 
-    public static function getConverters()
+    /**
+     * Gets preferred converter(s)
+     *
+     * @return array
+     */
+    public function getConverters()
     {
-        return self::$preferredConverters;
+        return $this->preferredConverters;
     }
 
-    public static function prepareConverters()
+    /**
+     * Sets whether to skip default converters (exclusively using preferred ones)
+     *
+     * @param boolean $skip
+     */
+    public function skipDefaultConverters($skip = true)
     {
-        // Prepare building up an array of converters
-        $converters = [];
+        $this->skipDefaultConverters = $skip;
+    }
 
-        // Saves all available converters inside the `Converters` directory to an array
-        $availableConverters = array_map(function ($filePath) {
+    /**
+     * Sets up converters to be used during conversion
+     *
+     * @return array
+     */
+    public function setUpConverters()
+    {
+        // Returns available converters if no preferred converters are set
+        if (empty($this->preferredConverters)) {
+            return $this->converters;
+        }
+
+        $converters = $this->preferredConverters;
+
+        // Returns preferred converters if set & remaining ones be skipped
+        if ($this->skipDefaultConverters) {
+            return $converters;
+        }
+
+        // Saves converters inside `Converters` directory to an array
+        $actualConverters = array_map(function ($filePath) {
             $fileName = basename($filePath, '.php');
             return strtolower($fileName);
         }, glob(__DIR__ . '/Converters/*.php'));
 
-        // If no preferred converters are set, return available ones
-        if (empty(self::$preferredConverters)) {
-            return $availableConverters;
-        }
-
-        // Checks if preferred converters match available converters and adds all matches to $converters array
-        foreach (self::$preferredConverters as $preferredConverter) {
-            if (in_array($preferredConverter, $availableConverters)) {
-                $converters[] = $preferredConverter;
-            }
-        }
-
-        if (self::$excludeDefaultBinaries) {
-            return $converters;
-        }
-
         // Fills $converters array with the remaining available converters, keeping the updated order of execution
-        foreach ($availableConverters as $availableConverter) {
-            if (in_array($availableConverter, $converters)) {
+        foreach ($this->converters as $converter) {
+            if (in_array($converter, $converters)) {
                 continue;
             }
-            $converters[] = $availableConverter;
+            $converters[] = $converter;
         }
 
-        return $converters;
+        return $converters + $actualConverters;
     }
 
     /**
-     * TODO: DocBlock
+     * Converts image to WebP
+     *
+     * @param string $source Path of input image
+     * @param string $destination Path of output image
+     * @param integer $quality Image compression quality (ranging from 0 to 100)
+     * @param boolean $stripMetadata Whether to strip metadata
+     *
+     * @return boolean
      */
-    public static function convert($source, $destination, $quality = 85, $stripMetadata = true)
+    public function convert($source, $destination, $quality = 85, $stripMetadata = true)
     {
         try {
-            self::isValidTarget($source);
-            self::isAllowedExtension($source);
-            self::createWritableFolder($destination);
+            $this->isValidTarget($source);
+            $this->isAllowedExtension($source);
+            $this->createWritableFolder($destination);
 
             $success = false;
 
-            foreach (self::prepareConverters() as $converter) {
-                $converter = ucfirst($converter);
-                $className = 'WebPConvert\\Converters\\' . $converter;
+            // Sets up converters ..
+            $currentConverters = $this->setUpConverters();
+
+            // .. and iterates over them
+            foreach ($currentConverters as $currentConverter) {
+                $converterName = ucfirst(strtolower($currentConverter));
+                $className = 'WebPConvert\\Converters\\' . $converterName;
 
                 if (!class_exists($className)) {
                     continue;
                 }
 
-                $object = new $className(
+                $converter = new $className(
                     $source,
                     $destination,
                     $quality,
                     $stripMetadata
                 );
 
-                if (!is_callable([$object, 'convertImage'])) {
+                if (!$converter instanceof ConverterAbstract || !is_callable([$converter, 'convert'])) {
                     continue;
                 }
 
-                $conversion = call_user_func([$object, 'convertImage']);
+                $conversion = call_user_func([$converter, 'convert']);
 
                 if ($conversion) {
                     $success = true;
+                    $this->setConverters($currentConverter);
+
                     break;
                 }
             }

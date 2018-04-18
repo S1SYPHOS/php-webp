@@ -26,7 +26,7 @@ class Imagick extends ConverterAbstract
         return true;
     }
 
-    public function convertImage()
+    public function convert()
     {
         try {
             $this->checkRequirements();

@@ -23,26 +23,22 @@ class Optimus extends ConverterAbstract
             throw new \Exception('Required url_init() function is not available.');
         }
 
-        if (!function_exists('curl_file_create')) {
-            throw new \Exception('Required curl_file_create() function is not available (requires PHP > 5.5).');
-        }
-
         return true;
     }
 
-    public function convertImage()
+    public function convert()
     {
         try {
             $this->checkRequirements();
 
             // Initializing cURL, setting response headers & requesting image conversion
             $url = 'https://api.optimus.io/' . WEBPCONVERT_OPTIMUS_KEY . '?webp';
-            $headers = array(
+            $headers = [
                 'User-Agent: Optimus-API',
                 'Accept: image/*'
-            );
+            ];
             $ch = curl_init();
-            curl_setopt_array($ch, array(
+            curl_setopt_array($ch, [
                 CURLOPT_URL => $url,
                 CURLOPT_HTTPHEADER => $headers,
                 CURLOPT_POSTFIELDS => file_get_contents($this->source),
@@ -50,7 +46,7 @@ class Optimus extends ConverterAbstract
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HEADER => true,
                 CURLOPT_SSL_VERIFYPEER => true
-            ));
+            ]);
             $response = curl_exec($ch);
             $curlError = curl_error($ch);
 

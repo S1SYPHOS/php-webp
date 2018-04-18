@@ -37,7 +37,7 @@ class Cwebp extends ConverterAbstract
         return true;
     }
 
-    public function prepareBinaries()
+    public function setUpBinaries()
     {
         // Removes system paths if the corresponding binary doesn't exist
         $binaries = array_filter($this->defaultPaths, function ($binary) {
@@ -84,13 +84,13 @@ class Cwebp extends ConverterAbstract
         }
     }
 
-    public function convertImage()
+    public function convert()
     {
         try {
             $this->checkRequirements();
 
             // Preparing array holding possible binaries
-            $binaries = $this->prepareBinaries();
+            $binaries = $this->setUpBinaries();
         } catch (\Exception $e) {
             return false; // TODO: `throw` custom \Exception $e & handle it smoothly on top-level.
         }

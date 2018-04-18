@@ -29,15 +29,21 @@ abstract class ConverterAbstract
 
     // Forces every converter to implement the following functions:
     // `checkRequirements()` - checks if converter's requirements are met
-    // `convertImage()` - converting given image to WebP
+    // `convert()` - converting given image to WebP
     abstract public function checkRequirements();
-    abstract public function convertImage();
+    abstract public function convert();
 
     /**
      *  Common functionality
      */
 
-    // Returns given file's extension
+    /**
+     * Returns given file's extension
+     *
+     * @param string $filePath
+     *
+     * @return string
+     */
     public function getExtension($filePath)
     {
         $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);

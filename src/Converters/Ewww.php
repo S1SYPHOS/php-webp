@@ -35,7 +35,7 @@ class Ewww extends ConverterAbstract
     }
 
     // Throws an exception if the provided API key is invalid
-    // TODO: Move to ConverterAbstract when other cloud services are added
+    // TODO: Move to ConverterAbstract when other cloud services are added (Optimus currently does NOT)
     public function isValidKey($key = WEBPCONVERT_EWWW_KEY)
     {
         try {
@@ -67,7 +67,7 @@ class Ewww extends ConverterAbstract
         return $success;
     }
 
-    public function convertImage()
+    public function convert()
     {
         try {
             $this->checkRequirements();
