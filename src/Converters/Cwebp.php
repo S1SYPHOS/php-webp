@@ -1,15 +1,15 @@
 <?php
 
-namespace WebPConvert\Converters;
+namespace PHPWebP\Converters;
 
-use WebPConvert\ConverterAbstract;
+use PHPWebP\ConverterAbstract;
 
 /**
  * Class Cwebp
  *
  * Converts an image to WebP via `cwebp` binaries directly
  *
- * @package WebPConvert\Converters
+ * @package PHPWebP\Converters
  */
 class Cwebp extends ConverterAbstract
 {
@@ -108,8 +108,8 @@ class Cwebp extends ConverterAbstract
 
         // Built-in method option
         $method = (
-            defined('WEBPCONVERT_CWEBP_METHOD')
-            ? '-m ' . WEBPCONVERT_CWEBP_METHOD
+            defined('PHPWEBP_CWEBP_METHOD')
+            ? '-m ' . PHPWEBP_CWEBP_METHOD
             : '-m 6'
         );
 
@@ -122,11 +122,11 @@ class Cwebp extends ConverterAbstract
         );
 
         // Built-in low memory option
-        if (!defined('WEBPCONVERT_CWEBP_LOW_MEMORY')) {
+        if (!defined('PHPWEBP_CWEBP_LOW_MEMORY')) {
             $lowMemory = '-low_memory';
         } else {
             $lowMemory = (
-                WEBPCONVERT_CWEBP_LOW_MEMORY
+                PHPWEBP_CWEBP_LOW_MEMORY
                 ? '-low_memory'
                 : ''
             );

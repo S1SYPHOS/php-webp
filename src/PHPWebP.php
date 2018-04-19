@@ -1,25 +1,25 @@
 <?php
 
 /**
- * WebPConvert - The WebP conversion library for PHP
+ * PHPWebP - The WebP conversion library for PHP
  *
  * @link https://github.com/S1SYPHOS/webp-convert
  * @license https://opensource.org/licenses/MIT MIT
  */
 
-namespace WebPConvert;
+namespace PHPWebP;
 
 /**
- * Class WebPConvert
+ * Class PHPWebP
  *
  * Converts JPEG & PNG to WebP with PHP
  *
- * @package WebPConvert
+ * @package PHPWebP
  */
-class WebPConvert
+class PHPWebP
 {
     /**
-     * Current version number of WebPConvert
+     * Current version number of PHPWebP
      */
     const VERSION = '1.0.0';
 
@@ -247,7 +247,7 @@ class WebPConvert
             // .. and iterates over them
             foreach ($currentConverters as $currentConverter) {
                 $converterName = ucfirst(strtolower($currentConverter));
-                $className = 'WebPConvert\\Converters\\' . $converterName;
+                $className = 'PHPWebP\\Converters\\' . $converterName;
 
                 if (!class_exists($className)) {
                     continue;

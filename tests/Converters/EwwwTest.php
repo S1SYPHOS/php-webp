@@ -1,15 +1,15 @@
 <?php
 
 /**
- * WebPConvert - Convert JPEG & PNG to WebP with PHP
+ * PHP-WebP - The WebP conversion library for PHP
  *
  * @link https://github.com/rosell-dk/webp-convert
  * @license MIT
  */
 
-namespace WebPConvert\Tests\Converters;
+namespace PHPWebP\Tests\Converters;
 
-use WebPConvert\Converters\Ewww;
+use PHPWebP\Converters\Ewww;
 use PHPUnit\Framework\TestCase;
 
 class EwwwTest extends TestCase
@@ -27,7 +27,7 @@ class EwwwTest extends TestCase
 
     public function testCheckRequirements()
     {
-        define("WEBPCONVERT_EWWW_KEY", "key-abc123");
+        define("PHPWEBP_EWWW_KEY", "key-abc123");
 
         $this->assertNotNull($this->ewww->checkRequirements());
     }

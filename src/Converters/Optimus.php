@@ -1,15 +1,15 @@
 <?php
 
-namespace WebPConvert\Converters;
+namespace PHPWebP\Converters;
 
-use WebPConvert\ConverterAbstract;
+use PHPWebP\ConverterAbstract;
 
 /**
  * Class Optimus
  *
  * Converts an image to WebP via Optimus.io by KeyCDN
  *
- * @package WebPConvert\Converters
+ * @package PHPWebP\Converters
  */
 class Optimus extends ConverterAbstract
 {
@@ -32,7 +32,7 @@ class Optimus extends ConverterAbstract
             $this->checkRequirements();
 
             // Initializing cURL, setting response headers & requesting image conversion
-            $url = 'https://api.optimus.io/' . WEBPCONVERT_OPTIMUS_KEY . '?webp';
+            $url = 'https://api.optimus.io/' . PHPWEBP_OPTIMUS_KEY . '?webp';
             $headers = [
                 'User-Agent: Optimus-API',
                 'Accept: image/*'

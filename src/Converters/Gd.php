@@ -1,15 +1,15 @@
 <?php
 
-namespace WebPConvert\Converters;
+namespace PHPWebP\Converters;
 
-use WebPConvert\ConverterAbstract;
+use PHPWebP\ConverterAbstract;
 
 /**
  * Class Gd
  *
  * Converts an image to WebP via GD Graphics (Draw)
  *
- * @package WebPConvert\Converters
+ * @package PHPWebP\Converters
  */
 class Gd extends ConverterAbstract
 {
@@ -33,10 +33,10 @@ class Gd extends ConverterAbstract
 
             switch ($this->extension) {
                 case 'png':
-                    if (defined('WEBPCONVERT_GD_PNG') && WEBPCONVERT_GD_PNG) {
+                    if (defined('PHPWEBP_GD_PNG') && PHPWEBP_GD_PNG) {
                         return imagecreatefrompng($this->source);
                     } else {
-                        // TODO: Troubleshooting section: define("WEBPCONVERT_GD_PNG", true);
+                        // TODO: Troubleshooting section: define("PHPWEBP_GD_PNG", true);
                         throw new \Exception('PNG file conversion failed.');
                     }
                     break;

@@ -1,15 +1,15 @@
 <?php
 
-namespace WebPConvert\Converters;
+namespace PHPWebP\Converters;
 
-use WebPConvert\ConverterAbstract;
+use PHPWebP\ConverterAbstract;
 
 /**
  * Class Imagick
  *
  * Converts an image to WebP via ImageMagick
  *
- * @package WebPConvert\Converters
+ * @package PHPWebP\Converters
  */
 class Imagick extends ConverterAbstract
 {
@@ -58,17 +58,17 @@ class Imagick extends ConverterAbstract
          * https://stackoverflow.com/questions/37711492/imagemagick-specific-webp-calls-in-php
          */
 
-        if (defined('WEBPCONVERT_IMAGICK_METHOD')) {
-            $im->setOption('webp:method', WEBPCONVERT_IMAGICK_METHOD);
+        if (defined('PHPWEBP_IMAGICK_METHOD')) {
+            $im->setOption('webp:method', PHPWEBP_IMAGICK_METHOD);
         } else {
             $im->setOption('webp:method', '6');
         }
 
-        if (!defined('WEBPCONVERT_IMAGICK_LOW_MEMORY')) {
+        if (!defined('PHPWEBP_IMAGICK_LOW_MEMORY')) {
             $im->setOption('webp:low-memory', 'true');
         } else {
             $im->setOption('webp:low-memory', (
-                WEBPCONVERT_IMAGICK_LOW_MEMORY
+                PHPWEBP_IMAGICK_LOW_MEMORY
                 ? 'true'
                 : 'false'
             ));

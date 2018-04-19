@@ -1,13 +1,13 @@
 <?php
 
-namespace WebPConvert;
+namespace PHPWebP;
 
 /**
  * Class ConverterAbstract
  *
  * Abstract class for all WebP converters
  *
- * @package WebPConvert
+ * @package PHPWebP
  */
 abstract class ConverterAbstract
 {

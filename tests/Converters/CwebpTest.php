@@ -1,15 +1,15 @@
 <?php
 
 /**
- * WebPConvert - Convert JPEG & PNG to WebP with PHP
+ * PHP-WebP - The WebP conversion library for PHP
  *
  * @link https://github.com/rosell-dk/webp-convert
  * @license MIT
  */
 
-namespace WebPConvert\Tests\Converters;
+namespace PHPWebP\Tests\Converters;
 
-use WebPConvert\Converters\Cwebp;
+use PHPWebP\Converters\Cwebp;
 use PHPUnit\Framework\TestCase;
 
 class CwebpTest extends TestCase

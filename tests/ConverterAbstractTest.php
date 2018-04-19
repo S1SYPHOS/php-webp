@@ -1,15 +1,15 @@
 <?php
 
 /**
- * WebPConvert - Convert JPEG & PNG to WebP with PHP
+ * PHP-WebP - The WebP conversion library for PHP
  *
  * @link https://github.com/rosell-dk/webp-convert
  * @license MIT
  */
 
-namespace WebPConvert\Tests;
+namespace PHPWebP\Tests;
 
-use WebPConvert\ConverterAbstract;
+use PHPWebP\ConverterAbstract;
 use PHPUnit\Framework\TestCase;
 
 class ConverterAbstractTest extends TestCase
@@ -23,7 +23,7 @@ class ConverterAbstractTest extends TestCase
         $this->source = realpath(__DIR__ . '/../test.jpg');
         $this->destination = realpath(__DIR__ . '/../test.webp');
         $this->mockObject = $this
-            ->getMockBuilder('WebPConvert\ConverterAbstract')
+            ->getMockBuilder('PHPWebP\ConverterAbstract')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass()
         ;

@@ -1,15 +1,15 @@
 <?php
 
-namespace WebPConvert\Converters;
+namespace PHPWebP\Converters;
 
-use WebPConvert\ConverterAbstract;
+use PHPWebP\ConverterAbstract;
 
 /**
  * Class Ewww
  *
  * Converts an image to WebP via EWWW Online Image Optimizer
  *
- * @package WebPConvert\Converters
+ * @package PHPWebP\Converters
  */
 class Ewww extends ConverterAbstract
 {
@@ -23,7 +23,7 @@ class Ewww extends ConverterAbstract
             throw new \Exception('Required url_init() function is not available.');
         }
 
-        if (!defined("WEBPCONVERT_EWWW_KEY")) {
+        if (!defined("PHPWEBP_EWWW_KEY")) {
             throw new \Exception('Missing API key.');
         }
 
@@ -36,7 +36,7 @@ class Ewww extends ConverterAbstract
 
     // Throws an exception if the provided API key is invalid
     // TODO: Move to ConverterAbstract when other cloud services are added (Optimus currently does NOT)
-    public function isValidKey($key = WEBPCONVERT_EWWW_KEY)
+    public function isValidKey($key = PHPWEBP_EWWW_KEY)
     {
         try {
             $curl = new \Curl\Curl();
@@ -79,7 +79,7 @@ class Ewww extends ConverterAbstract
             $curl = new \Curl\Curl();
             $curl->setHeader('User-Agent: WebPConvert', 'Accept: image/*');
             $result = $curl->post('https://optimize.exactlywww.com/v2/', [
-                'api_key' => WEBPCONVERT_EWWW_KEY,
+                'api_key' => PHPWEBP_EWWW_KEY,
                 'webp' => '1',
                 'file' => curl_file_create($this->source),
                 'quality' => $this->quality,

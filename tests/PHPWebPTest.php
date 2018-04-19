@@ -1,31 +1,31 @@
 <?php
 
 /**
- * WebPConvert - Convert JPEG & PNG to WebP with PHP
+ * PHP-WebP - The WebP conversion library for PHP
  *
  * @link https://github.com/rosell-dk/webp-convert
  * @license MIT
  */
 
-namespace WebPConvert\Tests;
+namespace PHPWebP\Tests;
 
-use WebPConvert\WebPConvert;
+use PHPWebP\PHPWebP;
 use PHPUnit\Framework\TestCase;
 
-class WebPConvertTest extends TestCase
+class PHPWebPTest extends TestCase
 {
     /**
      * @expectedException \Exception
      */
     public function testIsValidTargetInvalid()
     {
-        $wpc = new WebPConvert();
+        $wpc = new PHPWebP();
         $wpc->isValidTarget('Invalid');
     }
 
     public function testIsValidTargetValid()
     {
-        $wpc = new WebPConvert();
+        $wpc = new PHPWebP();
         $this->assertTrue($wpc->isValidTarget(__FILE__));
     }
 
@@ -34,7 +34,7 @@ class WebPConvertTest extends TestCase
      */
     public function testIsAllowedExtensionInvalid()
     {
-        $wpc = new WebPConvert();
+        $wpc = new PHPWebP();
         $allowed = ['jpg', 'jpeg', 'png'];
 
         foreach ($allowed as $key) {
@@ -44,14 +44,14 @@ class WebPConvertTest extends TestCase
 
     public function testIsAllowedExtensionValid()
     {
-        $wpc = new WebPConvert();
+        $wpc = new PHPWebP();
         $source = (__DIR__ . '/test.jpg');
         $this->assertTrue($wpc->isAllowedExtension($source));
     }
 
     public function testCreateWritableFolder()
     {
-        $wpc = new WebPConvert();
+        $wpc = new PHPWebP();
         $source = (__DIR__ . '/test/test.file');
         $path = pathinfo($source, PATHINFO_DIRNAME);
         $wpc->createWritableFolder($source);
@@ -61,14 +61,14 @@ class WebPConvertTest extends TestCase
 
     public function testDefaultConverterOrder()
     {
-        $wpc = new WebPConvert();
+        $wpc = new PHPWebP();
         $default = ['imagick', 'cwebp', 'gd', 'ewww', 'optimus']; // optimized converter order ('default order')
         $this->assertEquals($default, $wpc->setUpConverters());
     }
 
     public function testSetGetConverters()
     {
-        $wpc = new WebPConvert();
+        $wpc = new PHPWebP();
         $this->assertEmpty($wpc->getConverters());
 
         // Tests correct setting of converters ('natural order')
@@ -85,7 +85,7 @@ class WebPConvertTest extends TestCase
 
     public function testsetUpConverters()
     {
-        $wpc = new WebPConvert();
+        $wpc = new PHPWebP();
         $natural = ['imagick', 'cwebp', 'gd', 'ewww', 'optimus'];
         $this->assertEquals($natural, $wpc->setUpConverters());
 
@@ -99,7 +99,7 @@ class WebPConvertTest extends TestCase
 
     public function testConvert()
     {
-        $wpc = new WebPConvert();
+        $wpc = new PHPWebP();
         $source = (__DIR__ . '/test.jpg');
         $destination = (__DIR__ . '/test.webp');
         $wpc->setConverters(['imagick', 'cwebp', 'gd', 'ewww']);

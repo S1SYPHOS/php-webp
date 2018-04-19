@@ -1,4 +1,4 @@
-# PHP-WebP
+# PHPWebP
 *The WebP conversion library for PHP*
 
 In summary, the current state of WebP conversion in PHP is this: There are several ways to do it, but they all require *something* of the server setup. What works on one shared host might not work on another. `WebPConvert` combines these methods by iterating over them (optionally in the desired order) until one of them is successful - or all of them fail.
@@ -19,7 +19,7 @@ In summary, the current state of WebP conversion in PHP is this: There are sever
 Basically, there are three ways for JPEG & PNG to WebP conversion:
 - Executing the `cwebp` binary directly via `exec()`
 - Using a PHP extension (eg `gd` or `imagick`)
-- Connecting to a cloud service which does the conversion (eg `EWWW`)
+- Connecting to a cloud service which does the conversion (eg `ewww` or `optimus`)
 
 Converters **based on PHP extensions** should be your first choice. They are faster than other methods and they don't rely on server-side `exec()` calls (which may cause security risks). However, the `gd` converter doesn't support lossless conversion, so you may want to skip it when converting PNG images. Converters that **execute a binary** are also very fast (~ 50ms). Converters delegating the conversion process to a **cloud service** are much slower (~ one second), but work on *almost* any shared hosts (as opposed to the other methods). This makes the cloud-based converters an ideal last resort. They generally require you to *purchase* a paid plan, but the API key for [EWWW Image Optimizer](https://ewww.io) is very cheap. Beware though that you may encounter down-time whenever the cloud service is unavailable.
 
@@ -111,7 +111,7 @@ In the most basic design, a converter consists of a convert function which takes
 
 <table>
   <tr><th>Requirements</th><td>Imagick PHP extension (compiled with WebP support)</td></tr>
-  <tr><th>Performance</th><td>~20-320ms to convert a 40kb image (depending on <code>WEBPCONVERT_IMAGICK_METHOD</code>)</td></tr>
+  <tr><th>Performance</th><td>~20-320ms to convert a 40kb image (depending on <code>PHPWEBP_IMAGICK_METHOD</code>)</td></tr>
   <tr><th>Reliability</th><td>No problems detected so far!</td></tr>
   <tr><th>Availability</th><td>Probably only available on few shared hosts (if any)</td></tr>
 </table>
@@ -126,8 +126,8 @@ The converter supports:
 
 You can configure `imagick` by defining any of the following [constants](http://php.net/manual/en/language.constants.php):
 
-- `WEBPCONVERT_IMAGICK_METHOD`: This parameter controls the trade off between encoding speed and the compressed file size and quality. Possible values range from 0 to 6. When higher values are used, the encoder will spend more time inspecting additional encoding possibilities and decide on the quality gain. Lower value can result in faster processing time at the expense of larger file size and lower compression quality. Default value is 6 (higher than the default value of the `cwebp` command, which is 4).
-- `WEBPCONVERT_IMAGICK_LOW_MEMORY`: The low memory option will make the encoding slower and the output slightly different in size and distortion. This flag is only effective for methods 3 and up. It is *on* by default. To turn it off, set the constant to `false`.
+- `PHPWEBP_IMAGICK_METHOD`: This parameter controls the trade off between encoding speed and the compressed file size and quality. Possible values range from 0 to 6. When higher values are used, the encoder will spend more time inspecting additional encoding possibilities and decide on the quality gain. Lower value can result in faster processing time at the expense of larger file size and lower compression quality. Default value is 6 (higher than the default value of the `cwebp` command, which is 4).
+- `PHPWEBP_IMAGICK_LOW_MEMORY`: The low memory option will make the encoding slower and the output slightly different in size and distortion. This flag is only effective for methods 3 and up. It is *on* by default. To turn it off, set the constant to `false`.
 
 In order to get imagick with WebP on Ubuntu 16.04, you currently need to:
 1. [Compile libwebp from source](https://developers.google.com/speed/webp/docs/compiling)
@@ -145,9 +145,9 @@ In order to get imagick with WebP on Ubuntu 16.04, you currently need to:
   <tr><th>Availability</th><td>Unfortunately, according to <a href="https://stackoverflow.com/questions/25248382/how-to-create-a-webp-image-in-php">this link</a>, WebP support on shared hosts is rare.</td></tr>
 </table>
 
-`gd` neither supports copying metadata nor exposes any WebP options. Lacking the option to set lossless encoding results in poor encoding of PNGs - the filesize is generally much larger than the original. For this reason, PNG conversion is *disabled* by default. The converter however lets you override this default by defining the `WEBPCONVERT_GD_PNG` constant:
+`gd` neither supports copying metadata nor exposes any WebP options. Lacking the option to set lossless encoding results in poor encoding of PNGs - the filesize is generally much larger than the original. For this reason, PNG conversion is *disabled* by default. The converter however lets you override this default by defining the `PHPWEBP_GD_PNG` constant:
 
-- `WEBPCONVERT_GD_PNG`: If set to `true`, the converter will convert PNGs even though the result will be bad.
+- `PHPWEBP_GD_PNG`: If set to `true`, the converter will convert PNGs even though the result will be bad.
 
 <details>
 <summary><strong>Known bugs</strong> 👁</summary>
@@ -163,7 +163,7 @@ To get WebP support for `gd` in PHP 5.5.0, PHP must be configured with the `--wi
 
 <table>
   <tr><th>Requirements</th><td><code>exec()</code> function</td></tr>
-  <tr><th>Performance</th><td>~40-120ms to convert a 40kb image (depending on <code>WEBPCONVERT_CWEBP_METHOD</code>)</td></tr>
+  <tr><th>Performance</th><td>~40-120ms to convert a 40kb image (depending on <code>PHPWEBP_CWEBP_METHOD</code>)</td></tr>
   <tr><th>Reliability</th><td>No problems detected so far!</td></tr>
   <tr><th>Availability</th><td><code>exec()</code> is available on surprisingly many webhosts (a selection of which can be found <a href="https://docs.ewww.io/article/43-supported-web-hosts">here</a></td></tr>
 </table>
@@ -179,8 +179,8 @@ The converter supports:
 
 You can configure the converter by defining any of the following constants:
 
-- `WEBPCONVERT_CWEBP_METHOD`: This parameter controls the trade off between encoding speed and the compressed file size and quality. Possible values range from 0 to 6. When higher values are used, the encoder will spend more time inspecting additional encoding possibilities and decide on the quality gain. Lower value can result in faster processing time at the expense of larger file size and lower compression quality. Default value is 6 (higher than the default value of the cwebp command, which is 4).
-- `WEBPCONVERT_CWEBP_LOW_MEMORY`: The low memory option will make the encoding slower and the output slightly different in size and distortion. This flag is only effective for methods 3 and up. It is *on* by default. To turn it off, set the constant to `false`.
+- `PHPWEBP_CWEBP_METHOD`: This parameter controls the trade off between encoding speed and the compressed file size and quality. Possible values range from 0 to 6. When higher values are used, the encoder will spend more time inspecting additional encoding possibilities and decide on the quality gain. Lower value can result in faster processing time at the expense of larger file size and lower compression quality. Default value is 6 (higher than the default value of the cwebp command, which is 4).
+- `PHPWEBP_CWEBP_LOW_MEMORY`: The low memory option will make the encoding slower and the output slightly different in size and distortion. This flag is only effective for methods 3 and up. It is *on* by default. To turn it off, set the constant to `false`.
 
 ----
 
@@ -210,7 +210,7 @@ In more detail, the implementation does this:
 EWWW Image Optimizer is a very cheap cloud service for optimizing images. After purchasing an API key, simply set it up like this:
 
 ```text
-define("WEBPCONVERT_EWWW_KEY", "YOUR-KEY-HERE");
+define("PHPWEBP_EWWW_KEY", "YOUR-KEY-HERE");
 ```
 
 The converter supports:
