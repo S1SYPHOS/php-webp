@@ -25,13 +25,13 @@ class GdTest extends TestCase
         );
     }
 
-    public function testCheckRequirements()
-    {
-        $this->assertNotNull($this->gd->checkRequirements());
-    }
+    // public function testCheckRequirements()
+    // {
+    //     $this->assertNotNull($this->gd->checkRequirements());
+    // }
 
-    public function testConvert()
-    {
-        $this->assertTrue($this->gd->convert());
-    }
+    // public function testConvert()
+    // {
+    //     $this->assertTrue($this->gd->convert());
+    // }
 }

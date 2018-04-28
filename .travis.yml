@@ -13,7 +13,7 @@ sudo: false
 before_script:
   - (composer self-update; true)
   - composer install
+  - printf "\n" | pecl install imagick
 
 script:
   - composer test
-
