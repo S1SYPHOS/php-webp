@@ -54,7 +54,7 @@ class Optimus extends ConverterAbstract
             $result = substr($response, $header_size);
 
             if (!empty($curlError) || empty($result)) {
-                throw new Exception('cURL failed: ' . $curlError . ' Output: ' . $body);
+                throw new \Exception('cURL failed: ' . $curlError . ' Output: ' . $body);
             }
         } catch (\Exception $e) {
             return false; // TODO: `throw` custom \Exception $e & handle it smoothly on top-level.

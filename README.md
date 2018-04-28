@@ -12,6 +12,7 @@ In summary, the current state of WebP conversion in PHP is this: There are sever
   - [`gd`](#gd-graphics-draw)
   - [`cwebp`](#cwebp-binary)
   - [`ewww`](#ewww-cloud-service)
+  - [`optimus`](#optimus-cloud-service)
 - [5. Development](#development)
 - [6. Credits & License](#credits--license)
 
@@ -102,8 +103,8 @@ Each "method" of converting an image to WebP is implemented through a separate c
 In the most basic design, a converter consists of a convert function which takes the same arguments as `WebPConvert::convert`. Its job is then to convert `$source` to WebP and save it at `$destination`, preferably taking `$quality` and `$stripMetadata` into account. It however relies on the `WebPConvert` class to take care of the following common tasks:
 - Checking that `$source` file exists
 - Creating `$destination`if it doesn't exist
-- Ensuring that write permissions are granted
-- Handling errors / exceptions if need be
+- Ensuring write permissions are granted
+- Handling errors / exceptions
 
 ----
 
@@ -220,25 +221,18 @@ The converter supports:
 
 The cloud service supports other options, which can easily be implemented, if there is an interest. View options [here](https://ewww.io/api).
 
-<details>
-<summary><strong>Roadmap</strong> 👁</summary>
-
-The converter could be improved by using `fsockopen` when `cURL` is not available - which is extremely rare. PHP >= 5.5.0 is also widely available (PHP 5.4.0 reached end of life [more than two years ago!](http://php.net/supported-versions.php)).
-</details>
-
 ## Development
-
-`WebPConvert` uses the [PHP-CS-FIXER](https://github.com/FriendsOfPHP/PHP-CS-Fixer) library (based on squizlabs' [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer)) so all PHP files automagically comply with the [PSR-2](https://www.php-fig.org/psr/psr-2/) coding standard.
+`WebPConvert` uses [PHP-CS-FIXER](https://github.com/FriendsOfPHP/PHP-CS-Fixer) (based on squizlabs' [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer)) to guarantee automagical compliance with the [PSR-2](https://www.php-fig.org/psr/psr-2/) coding standard.
 
 ```text
-// Dry run - without making changes to any files
+// Dry run - prints suggested code improvements
 composer cs-dry
 
-// Production mode
+// Production mode - makes actual changes to files
 composer cs-fix
 ```
 
-Furthermore, testing is done with Sebastian Bergmann's excellent testing framework [PHPUnit](https://github.com/sebastianbergmann/phpunit), like this:
+Testing is done with Sebastian Bergmann's testing framework [PHPUnit](https://github.com/sebastianbergmann/phpunit):
 
 ```text
 composer test
