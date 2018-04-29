@@ -38,6 +38,7 @@ class Ewww extends ConverterAbstract
     // TODO: Move to ConverterAbstract when other cloud services are added (Optimus currently does NOT)
     public function isValidKey($key = PHPWEBP_EWWW_KEY)
     {
+      // TODO: Check if PHPWEBP_EWWW_KEY was even set, otherwise exit with Exception
         try {
             $curl = new \Curl\Curl();
             $result = $curl->post('https://optimize.exactlywww.com/verify/', [

@@ -30,8 +30,8 @@ class ImagickTest extends TestCase
         $this->assertNotNull($this->imagick->checkRequirements());
     }
 
-    public function testConvert()
-    {
-        $this->assertTrue($this->imagick->convert());
-    }
+    // public function testConvert()
+    // {
+    //     $this->assertTrue($this->imagick->convert());
+    // }
 }

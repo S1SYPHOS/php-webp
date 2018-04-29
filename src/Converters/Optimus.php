@@ -28,6 +28,7 @@ class Optimus extends ConverterAbstract
 
     public function convert()
     {
+      // TODO: Check if PHPWEBP_OPTIMUS_KEY was even set, otherwise exit with Exception
         try {
             $this->checkRequirements();
 
