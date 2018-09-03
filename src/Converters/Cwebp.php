@@ -105,6 +105,14 @@ class Cwebp extends ConverterAbstract
             ? '-lossless'
             : ''
         );
+        
+        //lossy PNG with alpha compression which is almost equal to lossless compression
+        //saves a lot of file size
+        $alpha_q = (
+            $this->extension == 'png'
+            ? '-alpha_q 100'
+            : ''
+        );
 
         // Built-in method option
         $method = (
